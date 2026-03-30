@@ -1,0 +1,14 @@
+{
+  "title": "Monoprice 4x4 HDBaseT 2.0 Matrix",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Monoprice Matrix",
+        "description": "Enter the Matrix host/IP.",
+        "data": {
+          "host": "Matrix IP or host"
+        }
+      }
+    }
+  }
+}

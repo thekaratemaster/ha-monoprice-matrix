@@ -1,0 +1,83 @@
+input_select:
+  matrix_out1:
+    name: Matrix Output 1 Route
+    options: ["Input 1", "Input 2", "Input 3", "Input 4"]
+  matrix_out2:
+    name: Matrix Output 2 Route
+    options: ["Input 1", "Input 2", "Input 3", "Input 4"]
+  matrix_out3:
+    name: Matrix Output 3 Route
+    options: ["Input 1", "Input 2", "Input 3", "Input 4"]
+  matrix_out4:
+    name: Matrix Output 4 Route
+    options: ["Input 1", "Input 2", "Input 3", "Input 4"]
+  matrix_audio_set:
+    name: Matrix Audio Set
+    options: ["A", "B", "C", "D"]
+
+input_button:
+  matrix_route_now:
+    name: Matrix — Route Now
+  matrix_audio_apply:
+    name: Matrix Audio — Apply Now
+
+automation:
+  - id: 5a0a7f4b-9d0a-4d35-ae29-25fdcfa6e9a1
+    alias: Matrix — Route From Helpers
+    description: >
+      Routes all 4 outputs on any helper change or Route Now button press,
+      targeting stable Monoprice select entity_ids.
+    mode: single
+    triggers:
+      # Any change to a helper routes everything (keeps behavior deterministic)
+      - trigger: state
+        entity_id:
+          - input_select.matrix_out1
+          - input_select.matrix_out2
+          - input_select.matrix_out3
+          - input_select.matrix_out4
+      # Input button updates state when pressed; state trigger works fine here
+      - trigger: state
+        entity_id: input_button.matrix_route_now
+    actions:
+      # Centralize mapping once (easy to maintain)
+      - variables:
+          routes:
+            - select: select.monoprice_matrix_output_1
+              helper: input_select.matrix_out1
+            - select: select.monoprice_matrix_output_2
+              helper: input_select.matrix_out2
+            - select: select.monoprice_matrix_output_3
+              helper: input_select.matrix_out3
+            - select: select.monoprice_matrix_output_4
+              helper: input_select.matrix_out4
+      - repeat:
+          for_each: "{{ routes }}"
+          sequence:
+            - action: select.select_option
+              target:
+                entity_id: "{{ repeat.item.select }}"
+              data:
+                option: "{{ states(repeat.item.helper) }}"
+
+  - id: 1c6cdd3c-2ad8-4c6b-a4f8-2fe02c8f0c24
+    alias: Matrix — Audio Set From Helper
+    description: >
+      Applies Audio Set A/B/C/D from helper or Apply Now button press,
+      targeting stable Monoprice audio set entity_id.
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: input_select.matrix_audio_set
+      - trigger: state
+        entity_id: input_button.matrix_audio_apply
+    actions:
+      - variables:
+          v: "{{ states('input_select.matrix_audio_set') | upper }}"
+      - condition: template
+        value_template: "{{ v in ['A', 'B', 'C', 'D'] }}"
+      - action: select.select_option
+        target:
+          entity_id: select.monoprice_matrix_audio_set
+        data:
+          option: "{{ v }}"
