@@ -1,0 +1,6 @@
+{
+  "name": "Monoprice 4x4 HDBaseT 2.0 Matrix",
+  "content_in_root": false,
+  "render_readme": true,
+  "homeassistant": "2024.1.0"
+}

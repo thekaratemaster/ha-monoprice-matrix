@@ -6,7 +6,7 @@
   "documentation": "https://example.invalid/monoprice_matrix",
   "requirements": [],
   "codeowners": [
-    "@you"
+    "@thekaratemaster"
   ],
   "iot_class": "local_polling",
   "loggers": [
